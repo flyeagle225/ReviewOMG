@@ -1,0 +1,11 @@
+# Local assistant/tool state; do not upload chats or local agent metadata.
+.claude/
+.claudian/
+
+# Obsidian volatile workspace/cache files.
+.obsidian/workspace*.json
+.obsidian/cache
+
+# System files.
+.DS_Store
+Thumbs.db

@@ -1,0 +1,55 @@
+# ReviewOMG 每日行业新闻配置
+# 所有自动化任务从 GitHub 仓库内读取本配置。
+# 注意：脚本只保存新闻摘要、标题、链接和博客选题，不保存聊天记录。
+
+site:
+  name: ReviewOMG
+  domain: reviewomg.com
+  niche:
+    - 星空灯
+    - star projector
+    - galaxy projector
+    - 3D galaxy projector
+    - 氛围灯
+    - ambient light
+    - gaming room lighting
+    - kids night light
+    - bedroom LED projector
+
+output:
+  directory: "20.行业情报"
+  max_items_per_query: 8
+  days_back: 7
+  language: "en-US"
+  region: "US"
+
+queries:
+  core_products:
+    - '"star projector" OR "galaxy projector"'
+    - '"3D galaxy projector" OR "bedroom LED projector"'
+    - '"ambient light" OR "ambient lighting" home'
+    - '"gaming room lighting" OR "game room lights"'
+    - '"kids night light" projector OR galaxy'
+  ecommerce_trends:
+    - 'Amazon "star projector" trending OR best seller'
+    - 'Amazon "galaxy projector" review OR bestseller'
+    - 'TikTok "star projector" OR "galaxy projector"'
+    - 'TikTok "ambient light" OR "gaming room lighting"'
+  social_video_trends:
+    - 'site:youtube.com "star projector" OR "galaxy projector" review'
+    - 'site:youtube.com "gaming room lighting" OR "ambient light"'
+    - 'site:tiktok.com "star projector" OR "galaxy projector"'
+    - 'site:instagram.com "star projector" OR "ambient lighting"'
+  smart_lighting:
+    - 'smart lighting new product ambient light projector'
+    - 'LED projector light home decor new product'
+    - 'home ambient lighting trends smart lights'
+  brands:
+    - 'Rossetta "star projector" OR "galaxy projector"'
+    - 'Govee ambient lighting OR gaming lights new product'
+    - 'OneFire kids night light projector'
+    - 'FlyLily star projector OR galaxy projector'
+    - 'Sega Homestar projector news OR review'
+  target_blogs:
+    - 'site:lightsdaddy.com star projector OR galaxy projector OR ambient light'
+    - 'site:space.com star projector OR galaxy projector'
