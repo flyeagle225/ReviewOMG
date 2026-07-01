@@ -9,6 +9,12 @@ on:
 permissions:
   contents: write
 
+env:
+  FEISHU_EMAIL: ${{ secrets.FEISHU_EMAIL }}
+  SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
+  SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+  SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+
 jobs:
   generate-topic-pool:
     runs-on: ubuntu-latest
@@ -23,6 +29,32 @@ jobs:
 
       - name: Generate weekly blog topic pool
         run: python scripts/generate_weekly_blog_ideas.py
+
+      - name: Locate generated topic pool
+        shell: bash
+        run: |
+          echo "TOPIC_FILE=$(ls -t '30.博客选题池'/*.md | head -n 1)" >> "$GITHUB_ENV"
+
+      - name: Send topic pool to Feishu email
+        if: ${{ env.FEISHU_EMAIL != '' && env.SMTP_SERVER != '' && env.SMTP_USERNAME != '' && env.SMTP_PASSWORD != '' }}
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER }}
+          server_port: ${{ secrets.SMTP_PORT || '465' }}
+          secure: true
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: "ReviewOMG Weekly Blog Topic Pool - ${{ github.run_number }}"
+          to: ${{ secrets.FEISHU_EMAIL }}
+          from: "ReviewOMG Bot <${{ secrets.SMTP_USERNAME }}>"
+          body: |
+            ReviewOMG weekly blog topic pool has been generated.
+
+            Obsidian/GitHub path:
+            ${{ env.TOPIC_FILE }}
+
+            The Markdown note is attached to this email.
+          attachments: ${{ env.TOPIC_FILE }}
 
       - name: Commit and push if changed
         uses: stefanzweifel/git-auto-commit-action@v5
