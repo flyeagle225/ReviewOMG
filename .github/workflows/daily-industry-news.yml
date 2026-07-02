@@ -2,8 +2,8 @@ name: Daily ReviewOMG Industry News
 
 on:
   schedule:
-    # 07:01 UTC = 15:01 Asia/Shanghai
-    - cron: "1 7 * * *"
+    # 01:00 UTC = 09:00 Asia/Shanghai
+    - cron: "0 1 * * *"
   workflow_dispatch:
 
 permissions:
