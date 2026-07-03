@@ -23,6 +23,13 @@ output:
   language: "en-US"
   region: "US"
 
+target_sites:
+  bolangmake_blog:
+    name: "Bolangmake Blog"
+    homepage: "https://www.bolangmake.com/blog/"
+    sitemap: "https://www.bolangmake.com/post-sitemap.xml"
+    max_items: 8
+
 queries:
   core_products:
     - '"star projector" OR "galaxy projector"'
@@ -53,3 +60,4 @@ queries:
   target_blogs:
     - 'site:lightsdaddy.com star projector OR galaxy projector OR ambient light'
     - 'site:space.com star projector OR galaxy projector'
+    - 'site:bolangmake.com/blog star projector OR galaxy projector OR ambient light'

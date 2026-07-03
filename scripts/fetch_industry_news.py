@@ -65,6 +65,19 @@ def parse_date(value: str) -> datetime | None:
         return None
 
 
+def parse_iso_date(value: str) -> datetime | None:
+    if not value:
+        return None
+    try:
+        normalized = value.strip().replace("Z", "+00:00")
+        dt = datetime.fromisoformat(normalized)
+        if dt.tzinfo is None:
+            dt = dt.replace(tzinfo=timezone.utc)
+        return dt
+    except Exception:
+        return None
+
+
 def google_news_rss_url(query: str, language: str, region: str) -> str:
     country = region.upper()
     lang_code = language.split("-")[0].lower()
@@ -87,6 +100,66 @@ def fetch_url(url: str, timeout: int = 25) -> bytes:
     )
     with urllib.request.urlopen(req, timeout=timeout) as resp:
         return resp.read()
+
+
+def title_from_url(url: str) -> str:
+    path = urllib.parse.urlparse(url).path.rstrip("/")
+    slug = path.rsplit("/", 1)[-1] if path else url
+    title = slug.replace("-", " ").replace("_", " ").strip()
+    return title.title() if title else url
+
+
+def fetch_target_site(site_key: str, site_cfg: dict[str, Any], *, cutoff: datetime) -> list[NewsItem]:
+    """Fetch recent articles from a target site's sitemap.
+
+    This is used for sites like bolangmake.com where RSS may be blocked but
+    Yoast/WordPress sitemaps remain public.
+    """
+    sitemap_url = site_cfg.get("sitemap")
+    if not sitemap_url:
+        return []
+    max_items = int(site_cfg.get("max_items", 8))
+    source_name = site_cfg.get("name", site_key)
+
+    try:
+        raw = fetch_url(sitemap_url)
+    except Exception as exc:
+        print(f"WARN target site fetch failed for {site_key!r}: {exc}", file=sys.stderr)
+        return []
+
+    try:
+        root = ET.fromstring(raw)
+    except ET.ParseError as exc:
+        print(f"WARN target site sitemap parse failed for {site_key!r}: {exc}", file=sys.stderr)
+        return []
+
+    ns = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
+    url_nodes = root.findall(".//sm:url", ns) or root.findall(".//url")
+    items: list[NewsItem] = []
+    for node in url_nodes:
+        loc_el = node.find("sm:loc", ns) or node.find("loc")
+        lastmod_el = node.find("sm:lastmod", ns) or node.find("lastmod")
+        link = (loc_el.text or "").strip() if loc_el is not None else ""
+        if not link:
+            continue
+        published = parse_iso_date(lastmod_el.text if lastmod_el is not None else "")
+        if published and published < cutoff:
+            continue
+        title = title_from_url(link)
+        items.append(
+            NewsItem(
+                category="target_sites",
+                query=f"{source_name} sitemap",
+                title=title,
+                link=link,
+                source=source_name,
+                published=published,
+                summary=f"Latest article detected from {source_name}. Homepage: {site_cfg.get('homepage', sitemap_url)}",
+            )
+        )
+        if len(items) >= max_items:
+            break
+    return items
 
 
 def source_from_item(item: ET.Element) -> str:
@@ -279,6 +352,9 @@ def main() -> int:
             all_items.extend(
                 fetch_query(category, query, language=language, region=region, max_items=max_items, cutoff=cutoff)
             )
+
+    for site_key, site_cfg in config.get("target_sites", {}).items():
+        all_items.extend(fetch_target_site(site_key, site_cfg, cutoff=cutoff))
 
     unique = dedupe(all_items)
     today = datetime.now()
