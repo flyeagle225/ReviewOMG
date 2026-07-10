@@ -222,18 +222,34 @@ def fetch_query(
     return items
 
 
+def normalized_link(link: str) -> str:
+    parsed = urllib.parse.urlparse(link)
+    query_pairs = urllib.parse.parse_qsl(parsed.query, keep_blank_values=False)
+    filtered_query = urllib.parse.urlencode(
+        [(k, v) for k, v in query_pairs if not k.lower().startswith("utm_") and k.lower() not in {"oc", "fbclid", "gclid"}]
+    )
+    return urllib.parse.urlunparse((parsed.scheme, parsed.netloc.lower(), parsed.path.rstrip("/"), "", filtered_query, ""))
+
+
+def normalized_title(title: str) -> str:
+    title = re.sub(r"\s+-\s+[^-]{2,80}$", "", title.lower())
+    return re.sub(r"\W+", "", title)[:140]
+
+
 def dedupe(items: list[NewsItem]) -> list[NewsItem]:
-    seen: set[str] = set()
+    seen_titles: set[str] = set()
+    seen_links: set[str] = set()
     unique: list[NewsItem] = []
     min_dt = datetime.min.replace(tzinfo=timezone.utc)
     for item in sorted(items, key=lambda x: x.published or min_dt, reverse=True):
-        key = re.sub(r"\W+", "", item.title.lower())[:120]
-        if key in seen:
+        title_key = normalized_title(item.title)
+        link_key = normalized_link(item.link)
+        if title_key in seen_titles or link_key in seen_links:
             continue
-        seen.add(key)
+        seen_titles.add(title_key)
+        seen_links.add(link_key)
         unique.append(item)
     return unique
-
 
 def md_escape(value: str) -> str:
     return value.replace("|", "\\|").replace("\n", " ").strip()
