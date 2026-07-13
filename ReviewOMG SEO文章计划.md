@@ -52,6 +52,8 @@ ReviewOMG 不要做泛泛的“灯具博客”，而要先成为：
 
 - Best Star Projectors 2026
 - Best Galaxy Projectors 2026
+- Best 3D Galaxy Projectors 2026
+- Best Ocean Projectors 2026
 - Best Galaxy Projector for Bedroom
 - Best Star Projector for Kids
 - Best Star Projector for Adults
@@ -62,7 +64,10 @@ ReviewOMG 不要做泛泛的“灯具博客”，而要先成为：
 
 - How to Choose a Galaxy Projector
 - Galaxy Projector Buying Guide: Brightness, Motion, Timer, Speaker, and Discs
+- 3D Galaxy Projector Buying Guide: What “3D” Really Means
+- Ocean Projector Buying Guide: Waves, Aurora, Nebula, and Relaxation Effects
 - Decorative Galaxy Projector vs Home Planetarium
+- Galaxy Projector vs Ocean Projector
 - Are Galaxy Projectors Worth It?
 
 ### Cluster B：品牌与产品评测集群
